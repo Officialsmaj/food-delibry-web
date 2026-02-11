@@ -3,7 +3,7 @@
 const categories = [
     { id: 1, name: 'Pizza', image: 'assets/images/pazza.jpg' },
     { id: 2, name: 'Burger', image: 'assets/images/burger.jpg' },
-    { id: 3, name: 'Pasta', image: 'https://via.placeholder.com/80x80?text=Pasta' },
+    { id: 3, name: 'Pasta', image: 'assets/images/margherita pizza.jpg' },
     { id: 4, name: 'Salad', image: 'assets/images/salad.jpg' },
     { id: 5, name: 'Dessert', image: 'assets/images/dessert.jpg' },
     { id: 6, name: 'Beverage', image: 'assets/images/beverage.jpg' }
@@ -13,7 +13,7 @@ const restaurants = [
     {
         id: 1,
         name: 'Italian Delight',
-        image: 'https://via.placeholder.com/300x200?text=Italian+Delight',
+        image: 'assets/images/Italian Delight.jpg',
         cuisine: 'Italian',
         rating: 4.5,
         deliveryTime: '25-30 min',
@@ -22,7 +22,7 @@ const restaurants = [
     {
         id: 2,
         name: 'Burger Junction',
-        image: 'https://via.placeholder.com/300x200?text=Burger+Junction',
+        image: 'assets/images/Burger Junction.jpg',
         cuisine: 'American',
         rating: 4.2,
         deliveryTime: '20-25 min',
@@ -31,7 +31,7 @@ const restaurants = [
     {
         id: 3,
         name: 'Asian Fusion',
-        image: 'https://via.placeholder.com/300x200?text=Asian+Fusion',
+        image: 'assets/images/Asian Fusion.jpg',
         cuisine: 'Asian',
         rating: 4.7,
         deliveryTime: '30-35 min',
@@ -40,7 +40,7 @@ const restaurants = [
     {
         id: 4,
         name: 'Healthy Eats',
-        image: 'https://via.placeholder.com/300x200?text=Healthy+Eats',
+        image: 'assets/images/Healthy Eats.jpg',
         cuisine: 'Healthy',
         rating: 4.3,
         deliveryTime: '15-20 min',
