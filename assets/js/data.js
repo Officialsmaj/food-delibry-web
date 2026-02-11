@@ -1,12 +1,12 @@
 // Sample data for the food delivery website
 
 const categories = [
-    { id: 1, name: 'Pizza', image: 'https://via.placeholder.com/80x80?text=Pizza' },
-    { id: 2, name: 'Burger', image: 'https://via.placeholder.com/80x80?text=Burger' },
+    { id: 1, name: 'Pizza', image: 'assets/images/pazza.jpg' },
+    { id: 2, name: 'Burger', image: 'assets/images/burger.jpg' },
     { id: 3, name: 'Pasta', image: 'https://via.placeholder.com/80x80?text=Pasta' },
-    { id: 4, name: 'Salad', image: 'https://via.placeholder.com/80x80?text=Salad' },
-    { id: 5, name: 'Dessert', image: 'https://via.placeholder.com/80x80?text=Dessert' },
-    { id: 6, name: 'Beverage', image: 'https://via.placeholder.com/80x80?text=Beverage' }
+    { id: 4, name: 'Salad', image: 'assets/images/salad.jpg' },
+    { id: 5, name: 'Dessert', image: 'assets/images/dessert.jpg' },
+    { id: 6, name: 'Beverage', image: 'assets/images/beverage.jpg' }
 ];
 
 const restaurants = [

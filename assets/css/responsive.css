@@ -177,6 +177,23 @@
     .error-section h2 {
         font-size: 1.5rem;
     }
+
+    /* Contact, FAQ, Privacy, Terms */
+    .contact-section h1, .faq-section h1, .privacy-section h1, .terms-section h1 {
+        font-size: 2rem;
+    }
+
+    .contact-form {
+        padding: 1.5rem;
+    }
+
+    .faq-list {
+        padding: 0 15px;
+    }
+
+    .privacy-section h2, .terms-section h2 {
+        font-size: 1.5rem;
+    }
 }
 
 /* Large Screens */
