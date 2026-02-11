@@ -1,5 +1,9 @@
 /* Responsive Styles */
 
+.close-menu {
+    display: none;
+}
+
 /* Tablet and Mobile */
 @media (max-width: 768px) {
     .container {
@@ -60,6 +64,19 @@
 
     .hamburger.active span:nth-child(3) {
         transform: rotate(45deg) translate(-5px, -6px);
+    }
+
+    .close-menu {
+        display: block;
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: none;
+        font-size: 2rem;
+        color: #333;
+        cursor: pointer;
+        z-index: 1000;
     }
 
     .hero {

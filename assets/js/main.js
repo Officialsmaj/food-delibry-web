@@ -15,11 +15,19 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         const hamburger = document.querySelector('.hamburger');
         const nav = document.querySelector('.nav');
+        const closeMenu = document.querySelector('.close-menu');
 
         if (hamburger && nav) {
             hamburger.addEventListener('click', function() {
                 nav.classList.toggle('active');
                 hamburger.classList.toggle('active');
+            });
+        }
+
+        if (closeMenu && nav) {
+            closeMenu.addEventListener('click', function() {
+                nav.classList.remove('active');
+                hamburger.classList.remove('active');
             });
         }
     }, 100); // Delay to ensure components are loaded

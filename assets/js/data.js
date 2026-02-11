@@ -1,19 +1,19 @@
 // Sample data for the food delivery website
 
 const categories = [
-    { id: 1, name: 'Pizza', image: 'assets/images/pizza.jpg' },
-    { id: 2, name: 'Burger', image: 'assets/images/burger.jpg' },
-    { id: 3, name: 'Pasta', image: 'assets/images/pasta.jpg' },
-    { id: 4, name: 'Salad', image: 'assets/images/salad.jpg' },
-    { id: 5, name: 'Dessert', image: 'assets/images/dessert.jpg' },
-    { id: 6, name: 'Beverage', image: 'assets/images/beverage.jpg' }
+    { id: 1, name: 'Pizza', image: 'https://via.placeholder.com/80x80?text=Pizza' },
+    { id: 2, name: 'Burger', image: 'https://via.placeholder.com/80x80?text=Burger' },
+    { id: 3, name: 'Pasta', image: 'https://via.placeholder.com/80x80?text=Pasta' },
+    { id: 4, name: 'Salad', image: 'https://via.placeholder.com/80x80?text=Salad' },
+    { id: 5, name: 'Dessert', image: 'https://via.placeholder.com/80x80?text=Dessert' },
+    { id: 6, name: 'Beverage', image: 'https://via.placeholder.com/80x80?text=Beverage' }
 ];
 
 const restaurants = [
     {
         id: 1,
         name: 'Italian Delight',
-        image: 'assets/images/restaurant1.jpg',
+        image: 'https://via.placeholder.com/300x200?text=Italian+Delight',
         cuisine: 'Italian',
         rating: 4.5,
         deliveryTime: '25-30 min',
@@ -22,7 +22,7 @@ const restaurants = [
     {
         id: 2,
         name: 'Burger Junction',
-        image: 'assets/images/restaurant2.jpg',
+        image: 'https://via.placeholder.com/300x200?text=Burger+Junction',
         cuisine: 'American',
         rating: 4.2,
         deliveryTime: '20-25 min',
@@ -31,7 +31,7 @@ const restaurants = [
     {
         id: 3,
         name: 'Asian Fusion',
-        image: 'assets/images/restaurant3.jpg',
+        image: 'https://via.placeholder.com/300x200?text=Asian+Fusion',
         cuisine: 'Asian',
         rating: 4.7,
         deliveryTime: '30-35 min',
@@ -40,7 +40,7 @@ const restaurants = [
     {
         id: 4,
         name: 'Healthy Eats',
-        image: 'assets/images/restaurant4.jpg',
+        image: 'https://via.placeholder.com/300x200?text=Healthy+Eats',
         cuisine: 'Healthy',
         rating: 4.3,
         deliveryTime: '15-20 min',

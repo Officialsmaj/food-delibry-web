@@ -163,9 +163,7 @@ button {
 
 /* Hero Section */
 .hero {
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../images/hero-bg.jpg');
-    background-size: cover;
-    background-position: center;
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
     color: white;
     padding: 8rem 0 6rem;
     text-align: center;
