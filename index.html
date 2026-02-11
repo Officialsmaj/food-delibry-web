@@ -56,7 +56,7 @@
             if (categoriesGrid) {
                 categoriesGrid.innerHTML = categories.map(category => `
                     <a class="category-card" href="menu.html?category=${category.id}">
-                        <img src="${category.image}" alt="${category.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"80\" viewBox=\"0 0 80 80\"><rect width=\"80\" height=\"80\" fill=\"#ddd\"/><text x=\"40\" y=\"45\" font-size=\"16\" fill=\"#999\" text-anchor=\"middle\">${category.name}</text></svg>'">
+                        <img src="${category.image}" alt="${category.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"80\" viewBox=\"0 0 80 80\"><rect width=\"80\" height=\"80\" fill=\"#ddd\"/></svg>'">
                         <h3>${category.name}</h3>
                     </a>
                 `).join('');
