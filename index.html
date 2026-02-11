@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodieExpress - Delicious Food Delivery</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body>
+    <div id="header"></div>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>Delicious Food Delivered Fast</h1>
+                    <p>Order from your favorite restaurants and get it delivered to your doorstep in minutes.</p>
+                    <a href="menu.html" class="cta-button">Order Now</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="categories">
+            <div class="container">
+                <h2>Explore Categories</h2>
+                <div class="category-grid" id="categories-grid">
+                    <!-- Categories will be populated by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <section class="restaurants">
+            <div class="container">
+                <h2>Featured Restaurants</h2>
+                <div class="restaurant-grid" id="restaurants-grid">
+                    <!-- Restaurants will be populated by JavaScript -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer"></div>
+
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/cart.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script>
+        // Render categories and restaurants on homepage
+        document.addEventListener('DOMContentLoaded', function() {
+            const categoriesGrid = document.getElementById('categories-grid');
+            const restaurantsGrid = document.getElementById('restaurants-grid');
+
+            if (categoriesGrid) {
+                categoriesGrid.innerHTML = categories.map(category => `
+                    <div class="category-card">
+                        <img src="${category.image}" alt="${category.name}" onerror="this.src='assets/images/placeholder.jpg'">
+                        <h3>${category.name}</h3>
+                    </div>
+                `).join('');
+            }
+
+            if (restaurantsGrid) {
+                restaurantsGrid.innerHTML = restaurants.map(restaurant => `
+                    <div class="restaurant-card">
+                        <img src="${restaurant.image}" alt="${restaurant.name}" onerror="this.src='assets/images/placeholder.jpg'">
+                        <div class="restaurant-info">
+                            <h3>${restaurant.name}</h3>
+                            <p>${restaurant.cuisine}</p>
+                            <p class="rating">⭐ ${restaurant.rating}</p>
+                            <p>${restaurant.deliveryTime}</p>
+                            <a href="menu.html?restaurant=${restaurant.id}" class="btn">View Menu</a>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        });
+    </script>
+</body>
+</html>
