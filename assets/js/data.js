@@ -13,7 +13,7 @@ const restaurants = [
     {
         id: 1,
         name: 'Italian Delight',
-        image: 'assets/images/Italian Delight.jpg',
+        image: 'assets/images/Italian Delight.jpeg',
         cuisine: 'Italian',
         rating: 4.5,
         deliveryTime: '25-30 min',
@@ -22,7 +22,7 @@ const restaurants = [
     {
         id: 2,
         name: 'Burger Junction',
-        image: 'assets/images/Burger Junction.jpg',
+        image: 'assets/images/Burger Junction.webp',
         cuisine: 'American',
         rating: 4.2,
         deliveryTime: '20-25 min',
@@ -31,7 +31,7 @@ const restaurants = [
     {
         id: 3,
         name: 'Asian Fusion',
-        image: 'assets/images/Asian Fusion.jpg',
+        image: 'assets/images/Asian Fusion.jpeg',
         cuisine: 'Asian',
         rating: 4.7,
         deliveryTime: '30-35 min',
