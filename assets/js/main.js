@@ -122,6 +122,33 @@ if (typeof validateEmail === 'undefined') {
     }
 }
 
+// Theme toggle function
+function toggleTheme() {
+    const body = document.body;
+    const themeToggle = document.querySelector('.theme-toggle');
+
+    body.classList.toggle('dark-mode');
+
+    if (body.classList.contains('dark-mode')) {
+        localStorage.setItem('theme', 'dark');
+        themeToggle.classList.add('dark');
+    } else {
+        localStorage.setItem('theme', 'light');
+        themeToggle.classList.remove('dark');
+    }
+}
+
+// Load saved theme
+document.addEventListener('DOMContentLoaded', function() {
+    const savedTheme = localStorage.getItem('theme');
+    const themeToggle = document.querySelector('.theme-toggle');
+
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        if (themeToggle) themeToggle.classList.add('dark');
+    }
+});
+
 // Show notification function (if not available from utils)
 if (typeof showNotification === 'undefined') {
     function showNotification(message, type = 'info') {

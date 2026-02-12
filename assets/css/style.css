@@ -104,6 +104,31 @@ button {
     font-size: 0.8rem;
 }
 
+.theme-toggle {
+    background: none;
+    border: none;
+    color: #ff6b35;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    margin-right: 1rem;
+}
+
+.theme-toggle:hover {
+    background-color: rgba(255, 107, 53, 0.1);
+    transform: scale(1.1);
+}
+
+.theme-toggle.dark {
+    color: #f9ca24;
+}
+
+.theme-toggle.dark i::before {
+    content: '\f185'; /* sun icon */
+}
+
 .hamburger {
     display: none;
     flex-direction: column;
@@ -1013,4 +1038,98 @@ main h1, main h2 {
 
 .progress-step.active + .progress-step::before {
     background-color: #ff6b35;
+}
+
+/* Dark Mode Styles */
+body.dark-mode {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.dark-mode .header {
+    background-color: #2d2d2d;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .logo a {
+    color: #ff6b35;
+}
+
+body.dark-mode .nav-list a {
+    color: #e0e0e0;
+}
+
+body.dark-mode .nav-list a:hover {
+    color: #ff6b35;
+}
+
+body.dark-mode .hero {
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.6), rgba(247, 147, 30, 0.6)), url('assets/images/pazza.jpg');
+    background-size: cover;
+    background-position: center;
+    color: white;
+}
+
+body.dark-mode .categories,
+body.dark-mode .menu-section,
+body.dark-mode .form-section,
+body.dark-mode .checkout-section,
+body.dark-mode .profile-section,
+body.dark-mode .orders-section,
+body.dark-mode .error-section,
+body.dark-mode .contact-section,
+body.dark-mode .faq-section,
+body.dark-mode .privacy-section,
+body.dark-mode .terms-section {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.dark-mode .category-card,
+body.dark-mode .restaurant-card,
+body.dark-mode .menu-item,
+body.dark-mode .cart-item,
+body.dark-mode .order-card,
+body.dark-mode .contact-form,
+body.dark-mode .faq-item {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .restaurant-card {
+    background-color: #2d2d2d;
+}
+
+body.dark-mode .delivery-form,
+body.dark-mode .order-summary,
+body.dark-mode .profile-info {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+}
+
+body.dark-mode .footer {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+}
+
+body.dark-mode .footer-section h3,
+body.dark-mode .footer-section h4 {
+    color: #ff6b35;
+}
+
+body.dark-mode .newsletter-form input {
+    background-color: #3d3d3d;
+    border-color: #555;
+    color: #e0e0e0;
+}
+
+body.dark-mode .newsletter-form input::placeholder {
+    color: #aaa;
+}
+
+body.dark-mode .notification {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }

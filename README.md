@@ -223,7 +223,7 @@ For support, email support@famínaexpress.com or create an issue in this reposit
 - [ ] Restaurant owner dashboard
 - [ ] Delivery tracking with maps
 - [ ] Multi-language support
-- [ ] Dark mode theme
+- [x] Dark mode theme
 - [ ] Progressive Web App (PWA) features
 
 ---
