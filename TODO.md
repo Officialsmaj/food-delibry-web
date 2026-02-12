@@ -1,4 +1,4 @@
-# TODO: Change FoodieExpress to FAMI-NA Express
+# COMPLETED: Change FoodieExpress to FAMI-NA Express
 
 - [x] Update components/header.html
 - [x] Update components/footer.html
@@ -11,9 +11,9 @@
 - [x] Update profile.html
 - [x] Update contact.html
 - [x] Update faq.html
-- [ ] Update privacy.html
-- [ ] Update terms.html
-- [ ] Update orders.html
-- [ ] Update checkout.html
-- [ ] Update 404.html
-- [ ] Update assets/js/menu.js
+- [x] Update privacy.html
+- [x] Update terms.html
+- [x] Update orders.html
+- [x] Update checkout.html
+- [x] Update 404.html
+- [x] Update assets/js/menu.js

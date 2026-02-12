@@ -194,6 +194,11 @@ button {
     padding-top: 1rem;
 }
 
+/* Main content spacing */
+main h1, main h2 {
+    margin-top: 2rem;
+}
+
 /* Hero Section */
 .hero {
     background: linear-gradient(135deg, rgba(255, 107, 53, 0.8), rgba(247, 147, 30, 0.8)), url('assets/images/pazza.jpg');
