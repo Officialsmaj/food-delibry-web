@@ -1,4 +1,4 @@
-const CACHE_NAME = 'food-delivery-v1';
+const CACHE_NAME = 'famína-express-v1';
 const urlsToCache = [
   '/',
   '/index.html',

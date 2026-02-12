@@ -1,6 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const webpush = require('web-push');
+
+// VAPID keys (should match notifications.js)
+const vapidKeys = {
+  publicKey: 'YOUR_VAPID_PUBLIC_KEY',
+  privateKey: 'YOUR_VAPID_PRIVATE_KEY'
+};
+
+webpush.setVapidDetails(
+  'mailto:your-email@example.com',
+  vapidKeys.publicKey,
+  vapidKeys.privateKey
+);
+
+// In-memory storage for subscriptions (use database in production)
+let subscriptions = [];
 
 const orders = [];
 
@@ -53,6 +69,10 @@ router.post('/', authenticate, (req, res) => {
     createdAt: new Date()
   };
   orders.push(order);
+
+  // Send push notification for new order
+  sendPushNotification(order.userId, 'Order Placed', `Your order #${order.id} has been placed successfully!`);
+
   res.json(order);
 });
 

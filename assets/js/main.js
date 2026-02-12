@@ -47,6 +47,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Push notifications
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+        registerServiceWorker();
+        initializePushNotifications();
+        setupNotificationButton();
+    }
+
     // Page load animation: fade-in and slide down for main content
     // This applies to all pages with a <main> element
     const main = document.querySelector('main');
@@ -173,4 +180,105 @@ if (typeof showNotification === 'undefined') {
     function showNotification(message, type = 'info') {
         alert(message);
     }
+}
+
+// Register service worker for push notifications
+async function registerServiceWorker() {
+    try {
+        const registration = await navigator.serviceWorker.register('/sw.js');
+        console.log('Service Worker registered successfully:', registration);
+        return registration;
+    } catch (error) {
+        console.error('Service Worker registration failed:', error);
+    }
+}
+
+// Initialize push notifications
+async function initializePushNotifications() {
+    try {
+        const registration = await navigator.serviceWorker.ready;
+
+        // Check if already subscribed
+        let subscription = await registration.pushManager.getSubscription();
+
+        if (!subscription) {
+            // Request permission and subscribe
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array('YOUR_VAPID_PUBLIC_KEY') // Replace with your VAPID public key
+                });
+
+                // Get VAPID public key from backend
+                const vapidResponse = await fetch('http://localhost:3001/api/notifications/public-key');
+                const { publicKey } = await vapidResponse.json();
+
+                subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(publicKey)
+                });
+
+                // Send subscription to backend
+                await fetch('http://localhost:3001/api/notifications/subscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ subscription })
+                });
+
+                showNotification('Push notifications enabled!');
+            }
+        }
+    } catch (error) {
+        console.error('Push notification initialization failed:', error);
+    }
+}
+
+// Utility function to convert VAPID key
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+        .replace(/-/g, '+')
+        .replace(/_/g, '/');
+
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+}
+
+// Setup notification button
+async function setupNotificationButton() {
+    const notificationBtn = document.getElementById('notification-btn');
+    if (!notificationBtn) return;
+
+    // Check if already subscribed
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.getSubscription();
+
+    if (subscription) {
+        notificationBtn.classList.add('enabled');
+        notificationBtn.title = 'Notifications Enabled';
+    }
+
+    notificationBtn.addEventListener('click', async () => {
+        if (subscription) {
+            // Unsubscribe
+            await subscription.unsubscribe();
+            notificationBtn.classList.remove('enabled');
+            notificationBtn.title = 'Enable Notifications';
+            showNotification('Push notifications disabled');
+        } else {
+            // Subscribe
+            await initializePushNotifications();
+            notificationBtn.classList.add('enabled');
+            notificationBtn.title = 'Notifications Enabled';
+        }
+    });
 }
