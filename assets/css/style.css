@@ -173,11 +173,19 @@ button {
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 4px;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease; /* Smooth transition for all properties */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Initial shadow */
 }
 
 .newsletter-form button:hover {
     background-color: #e55a2b;
+    transform: scale(1.05); /* Slight scale-up on hover */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Increased shadow on hover */
+}
+
+.newsletter-form button:active {
+    transform: scale(0.95); /* Subtle press animation on click */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Reduced shadow on active */
 }
 
 .footer-bottom {
@@ -212,11 +220,19 @@ button {
     padding: 1rem 2rem;
     border-radius: 50px;
     font-size: 1.1rem;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease; /* Smooth transition for all properties */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Initial shadow */
 }
 
 .cta-button:hover {
     background-color: #e55a2b;
+    transform: scale(1.05); /* Slight scale-up on hover */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Increased shadow on hover */
+}
+
+.cta-button:active {
+    transform: scale(0.95); /* Subtle press animation on click */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Reduced shadow on active */
 }
 
 /* Categories Section */
@@ -397,6 +413,19 @@ button {
     border-radius: 4px;
     width: 100%;
     margin-top: 1rem;
+    transition: all 0.3s ease; /* Smooth transition for all properties */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Initial shadow */
+}
+
+.add-to-cart:hover {
+    background-color: #e55a2b;
+    transform: scale(1.05); /* Slight scale-up on hover */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Increased shadow on hover */
+}
+
+.add-to-cart:active {
+    transform: scale(0.95); /* Subtle press animation on click */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Reduced shadow on active */
 }
 
 /* Cart Styles */
@@ -522,11 +551,19 @@ button {
     border-radius: 4px;
     width: 100%;
     font-size: 1.1rem;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease; /* Smooth transition for all properties */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Initial shadow */
 }
 
 .submit-btn:hover {
     background-color: #e55a2b;
+    transform: scale(1.05); /* Slight scale-up on hover */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Increased shadow on hover */
+}
+
+.submit-btn:active {
+    transform: scale(0.95); /* Subtle press animation on click */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Reduced shadow on active */
 }
 
 /* Checkout */
@@ -785,11 +822,19 @@ button {
     color: white;
     border-radius: 4px;
     text-align: center;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease; /* Enhanced transition for smooth effects */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Initial shadow */
 }
 
 .btn:hover {
     background-color: #e55a2b;
+    transform: scale(1.05); /* Slight scale-up on hover */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Increased shadow on hover */
+}
+
+.btn:active {
+    transform: scale(0.95); /* Subtle press animation on click */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Reduced shadow on active */
 }
 
 .text-center {

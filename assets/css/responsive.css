@@ -101,6 +101,16 @@
         gap: 2rem;
     }
 
+    .social-links {
+        gap: 10px; /* Slightly tighter spacing on mobile */
+    }
+
+    .social-link {
+        width: 35px; /* Smaller size on mobile */
+        height: 35px;
+        font-size: 1.3rem;
+    }
+
     .checkout-container {
         grid-template-columns: 1fr;
         gap: 2rem;

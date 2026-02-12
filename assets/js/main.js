@@ -46,6 +46,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Page load animation: fade-in and slide down for main content
+    // This applies to all pages with a <main> element
+    const main = document.querySelector('main');
+    if (main) {
+        // Start with hidden state
+        main.style.opacity = '0';
+        main.style.transform = 'translateY(20px)';
+        main.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+
+        // Trigger animation after a short delay to ensure rendering
+        setTimeout(() => {
+            main.style.opacity = '1';
+            main.style.transform = 'translateY(0)';
+        }, 100);
+    }
 });
 
 // Update cart count in header
