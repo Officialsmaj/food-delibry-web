@@ -1,3 +1,4 @@
+
 /* Reset and Base Styles */
 * {
     margin: 0;
@@ -540,6 +541,7 @@ main h1, main h2 {
 
 /* Forms */
 .form-section {
+    margin-top: 120px;
     padding: 4rem 0;
     background-color: white;
     max-width: 500px;
@@ -882,6 +884,22 @@ main h1, main h2 {
 
 .smaj {
     margin-top: 30px;
+}
+
+/* Animations */
+.fade-in {
+    animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Notification Styles */

@@ -17,3 +17,15 @@
 - [x] Update checkout.html
 - [x] Update 404.html
 - [x] Update assets/js/menu.js
+
+# COMPLETED: Make site offline and work on one device
+
+- [x] Add Service Worker for caching assets and pages
+- [x] Register Service Worker in index.html
+- [x] Ensure all data is stored in localStorage (cart, auth, orders)
+- [x] Add margin-top to form-section for space between header and forms
+
+# COMPLETED: Add loading effects to all pages
+
+- [x] Add fade-in animation on scroll for sections across all pages
+- [x] Include fade-in CSS classes and keyframes
