@@ -166,22 +166,72 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('profile-name').value = currentUser.name;
             document.getElementById('profile-email').value = currentUser.email;
 
+            // Load profile picture if exists
+            const profilePic = document.getElementById('profile-picture');
+            if (currentUser.profilePicture) {
+                profilePic.src = currentUser.profilePicture;
+            }
+
+            // Handle profile picture upload
+            const pictureInput = document.getElementById('profile-picture-input');
+            if (pictureInput) {
+                pictureInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        // Validate file type
+                        if (!file.type.startsWith('image/')) {
+                            showNotification('Please select a valid image file.', 'error');
+                            return;
+                        }
+
+                        // Validate file size (max 5MB)
+                        if (file.size > 5 * 1024 * 1024) {
+                            showNotification('Image size should be less than 5MB.', 'error');
+                            return;
+                        }
+
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            profilePic.src = event.target.result;
+                            // Store the base64 data temporarily
+                            profilePic.dataset.tempImage = event.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
             profileForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 const formData = new FormData(this);
                 const userData = {
                     name: formData.get('name'),
-                    email: formData.get('email')
+                    email: formData.get('email'),
+                    currentPassword: formData.get('currentPassword'),
+                    newPassword: formData.get('newPassword'),
+                    confirmPassword: formData.get('confirmPassword')
                 };
+
+                // Add profile picture if changed
+                if (profilePic.dataset.tempImage) {
+                    userData.profilePicture = profilePic.dataset.tempImage;
+                }
 
                 if (userData.name && userData.email) {
                     if (validateEmail(userData.email)) {
-                        updateUserProfile(userData);
+                        if (updateUserProfile(userData)) {
+                            // Clear temporary data
+                            delete profilePic.dataset.tempImage;
+                            // Clear password fields
+                            document.getElementById('current-password').value = '';
+                            document.getElementById('new-password').value = '';
+                            document.getElementById('confirm-password').value = '';
+                        }
                     } else {
                         showNotification('Please enter a valid email address.', 'error');
                     }
                 } else {
-                    showNotification('Please fill in all fields.', 'error');
+                    showNotification('Please fill in name and email fields.', 'error');
                 }
             });
         } else {
