@@ -52,6 +52,24 @@ function validateEmail(email) {
     return re.test(email);
 }
 
+// Validate phone number (basic US format)
+function validatePhone(phone) {
+    const re = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+    return re.test(phone);
+}
+
+// Show loading indicator
+function showLoading(button) {
+    button.disabled = true;
+    button.innerHTML = '<span class="loading"></span> Loading...';
+}
+
+// Hide loading indicator
+function hideLoading(button, originalText) {
+    button.disabled = false;
+    button.innerHTML = originalText;
+}
+
 // Capitalize first letter
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -67,6 +85,9 @@ if (typeof module !== 'undefined' && module.exports) {
         debounce,
         generateId,
         validateEmail,
+        validatePhone,
+        showLoading,
+        hideLoading,
         capitalize
     };
 }

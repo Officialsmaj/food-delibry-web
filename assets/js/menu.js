@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update page title or add restaurant name
         const restaurant = restaurants.find(r => r.id == restaurantId);
         if (restaurant) {
-            document.title = `${restaurant.name} Menu - FoodieExpress`;
+            document.title = `${restaurant.name} Menu - FAMI-NA Express`;
         }
     }
 });
