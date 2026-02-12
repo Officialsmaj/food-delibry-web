@@ -5,6 +5,15 @@ const API_BASE = 'http://localhost:3001/api';
 let categories = [];
 let restaurants = [];
 let menuItems = [];
+let filteredItems = [];
+let currentFilters = {
+    search: '',
+    category: 'all',
+    priceRange: 'all',
+    restaurant: 'all',
+    sortBy: 'name',
+    dietary: []
+};
 
 // Load data from API
 async function loadData() {
@@ -28,7 +37,25 @@ async function loadData() {
 
         if (menuRes.ok) {
             menuItems = await menuRes.json();
+            // Add dietary tags to menu items (mock data for now)
+            menuItems.forEach(item => {
+                item.dietary = [];
+                if (item.name.toLowerCase().includes('salad') || item.name.toLowerCase().includes('vegetable')) {
+                    item.dietary.push('vegetarian');
+                }
+                if (item.name.toLowerCase().includes('vegan')) {
+                    item.dietary.push('vegan');
+                }
+                if (item.name.toLowerCase().includes('gluten')) {
+                    item.dietary.push('gluten-free');
+                }
+                if (item.name.toLowerCase().includes('spicy') || item.name.toLowerCase().includes('hot')) {
+                    item.dietary.push('spicy');
+                }
+            });
         }
+
+        filteredItems = [...menuItems];
     } catch (error) {
         console.error('Error loading data:', error);
     }
@@ -109,6 +136,194 @@ function renderRestaurants() {
     `).join('');
 }
 
+// Initialize advanced filters
+function initializeAdvancedFilters() {
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-btn');
+    const priceRange = document.getElementById('price-range');
+    const restaurantFilter = document.getElementById('restaurant-filter');
+    const sortBy = document.getElementById('sort-by');
+    const clearFiltersBtn = document.getElementById('clear-filters');
+    const dietaryCheckboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
+
+    // Populate restaurant filter options
+    if (restaurantFilter) {
+        restaurantFilter.innerHTML = '<option value="all">All Restaurants</option>' +
+            restaurants.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+    }
+
+    // Search functionality
+    if (searchInput && searchBtn) {
+        const performSearch = () => {
+            currentFilters.search = searchInput.value.toLowerCase().trim();
+            applyFilters();
+        };
+
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') performSearch();
+        });
+
+        // Debounced search
+        searchInput.addEventListener('input', debounce(() => {
+            currentFilters.search = searchInput.value.toLowerCase().trim();
+            applyFilters();
+        }, 300));
+    }
+
+    // Price range filter
+    if (priceRange) {
+        priceRange.addEventListener('change', () => {
+            currentFilters.priceRange = priceRange.value;
+            applyFilters();
+        });
+    }
+
+    // Restaurant filter
+    if (restaurantFilter) {
+        restaurantFilter.addEventListener('change', () => {
+            currentFilters.restaurant = restaurantFilter.value;
+            applyFilters();
+        });
+    }
+
+    // Sort by
+    if (sortBy) {
+        sortBy.addEventListener('change', () => {
+            currentFilters.sortBy = sortBy.value;
+            applyFilters();
+        });
+    }
+
+    // Dietary checkboxes
+    dietaryCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            currentFilters.dietary = Array.from(dietaryCheckboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+            applyFilters();
+        });
+    });
+
+    // Clear filters
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', clearAllFilters);
+    }
+}
+
+// Apply all filters
+function applyFilters() {
+    let filtered = [...menuItems];
+
+    // Search filter
+    if (currentFilters.search) {
+        filtered = filtered.filter(item =>
+            item.name.toLowerCase().includes(currentFilters.search) ||
+            item.description.toLowerCase().includes(currentFilters.search) ||
+            item.category.toLowerCase().includes(currentFilters.search) ||
+            restaurants.find(r => r.id === item.restaurantId)?.name.toLowerCase().includes(currentFilters.search)
+        );
+    }
+
+    // Category filter
+    if (currentFilters.category !== 'all') {
+        filtered = filtered.filter(item => item.category === currentFilters.category);
+    }
+
+    // Price range filter
+    if (currentFilters.priceRange !== 'all') {
+        filtered = filtered.filter(item => {
+            const price = item.price;
+            switch (currentFilters.priceRange) {
+                case '0-10': return price >= 0 && price <= 10;
+                case '10-20': return price > 10 && price <= 20;
+                case '20-30': return price > 20 && price <= 30;
+                case '30+': return price > 30;
+                default: return true;
+            }
+        });
+    }
+
+    // Restaurant filter
+    if (currentFilters.restaurant !== 'all') {
+        filtered = filtered.filter(item => item.restaurantId == currentFilters.restaurant);
+    }
+
+    // Dietary filter
+    if (currentFilters.dietary.length > 0) {
+        filtered = filtered.filter(item =>
+            currentFilters.dietary.some(diet => item.dietary.includes(diet))
+        );
+    }
+
+    // Sort items
+    filtered = sortItems(filtered, currentFilters.sortBy);
+
+    filteredItems = filtered;
+    renderMenuItems(filtered);
+    updateResultsCount(filtered.length);
+}
+
+// Sort items
+function sortItems(items, sortBy) {
+    return items.sort((a, b) => {
+        switch (sortBy) {
+            case 'price-low':
+                return a.price - b.price;
+            case 'price-high':
+                return b.price - a.price;
+            case 'rating':
+                const aRating = restaurants.find(r => r.id === a.restaurantId)?.rating || 0;
+                const bRating = restaurants.find(r => r.id === b.restaurantId)?.rating || 0;
+                return bRating - aRating;
+            case 'name':
+            default:
+                return a.name.localeCompare(b.name);
+        }
+    });
+}
+
+// Update results count
+function updateResultsCount(count) {
+    const resultsCount = document.getElementById('results-count');
+    if (resultsCount) {
+        resultsCount.textContent = `${count} item${count !== 1 ? 's' : ''} found`;
+    }
+}
+
+// Clear all filters
+function clearAllFilters() {
+    currentFilters = {
+        search: '',
+        category: 'all',
+        priceRange: 'all',
+        restaurant: 'all',
+        sortBy: 'name',
+        dietary: []
+    };
+
+    // Reset form elements
+    const searchInput = document.getElementById('search-input');
+    const priceRange = document.getElementById('price-range');
+    const restaurantFilter = document.getElementById('restaurant-filter');
+    const sortBy = document.getElementById('sort-by');
+    const dietaryCheckboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
+
+    if (searchInput) searchInput.value = '';
+    if (priceRange) priceRange.value = 'all';
+    if (restaurantFilter) restaurantFilter.value = 'all';
+    if (sortBy) sortBy.value = 'name';
+    dietaryCheckboxes.forEach(cb => cb.checked = false);
+
+    // Reset category buttons
+    const categoryButtons = document.querySelectorAll('#categories-filter .filter-btn');
+    categoryButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.category === 'all');
+    });
+
+    applyFilters();
+}
+
 // Initialize menu page
 document.addEventListener('DOMContentLoaded', async function() {
     await loadData();
@@ -116,7 +331,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Render categories and menu items on menu.html
     if (document.getElementById('categories-filter')) {
         renderCategories();
+        initializeAdvancedFilters();
         renderMenuItems(menuItems); // Show all items initially
+        updateResultsCount(menuItems.length);
     }
 
     // Render restaurants on restaurant.html
@@ -128,8 +345,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     const urlParams = new URLSearchParams(window.location.search);
     const restaurantId = urlParams.get('restaurant');
     if (restaurantId && document.getElementById('menu-items')) {
-        const restaurantItems = menuItems.filter(item => item.restaurantId == restaurantId);
-        renderMenuItems(restaurantItems);
+        currentFilters.restaurant = restaurantId;
+        const restaurantFilter = document.getElementById('restaurant-filter');
+        if (restaurantFilter) restaurantFilter.value = restaurantId;
+        applyFilters();
+
         // Update page title or add restaurant name
         const restaurant = restaurants.find(r => r.id == restaurantId);
         if (restaurant) {

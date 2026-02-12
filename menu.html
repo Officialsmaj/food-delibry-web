@@ -14,9 +14,71 @@
         <section class="menu-section">
             <div class="container">
                 <h2>Our Menu</h2>
-                <div class="filters" id="categories-filter">
-                    <!-- Filter buttons will be populated by JavaScript -->
+
+                <!-- Search Bar -->
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="Search for food, restaurants, or cuisines..." class="search-input">
+                    <button id="search-btn" class="search-btn">🔍</button>
                 </div>
+
+                <!-- Advanced Filters -->
+                <div class="advanced-filters">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="price-range">Price Range:</label>
+                            <select id="price-range">
+                                <option value="all">All Prices</option>
+                                <option value="0-10">$0 - $10</option>
+                                <option value="10-20">$10 - $20</option>
+                                <option value="20-30">$20 - $30</option>
+                                <option value="30+">$30+</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="restaurant-filter">Restaurant:</label>
+                            <select id="restaurant-filter">
+                                <option value="all">All Restaurants</option>
+                                <!-- Restaurant options will be populated by JavaScript -->
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="sort-by">Sort By:</label>
+                            <select id="sort-by">
+                                <option value="name">Name</option>
+                                <option value="price-low">Price: Low to High</option>
+                                <option value="price-high">Price: High to Low</option>
+                                <option value="rating">Rating</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label>Dietary Options:</label>
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" value="vegetarian"> Vegetarian</label>
+                                <label><input type="checkbox" value="vegan"> Vegan</label>
+                                <label><input type="checkbox" value="gluten-free"> Gluten-Free</label>
+                                <label><input type="checkbox" value="spicy"> Spicy</label>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <button id="clear-filters" class="btn-secondary">Clear All Filters</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filters" id="categories-filter">
+                    <!-- Category filter buttons will be populated by JavaScript -->
+                </div>
+
+                <div class="results-info">
+                    <span id="results-count">0 items found</span>
+                </div>
+
                 <div class="menu-grid" id="menu-items">
                     <!-- Menu items will be populated by JavaScript -->
                 </div>

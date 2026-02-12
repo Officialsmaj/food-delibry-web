@@ -59,6 +59,17 @@ food-delivery-web/
 ├── 404.html                   # Error page
 ├── TODO.md                    # Project task list
 ├── README.md                  # Project documentation
+├── backend/
+│   ├── server.js              # Express server setup
+│   ├── package.json           # Node.js dependencies
+│   └── routes/
+│       ├── auth.js            # Authentication API routes
+│       ├── restaurants.js     # Restaurant data API
+│       ├── menu.js            # Menu items API
+│       ├── cart.js            # Shopping cart API
+│       ├── orders.js          # Order management API
+│       ├── payments.js        # Stripe payment processing
+│       └── notifications.js   # Push notifications API
 ├── assets/
 │   ├── css/
 │   │   ├── style.css          # Main stylesheet
