@@ -26,3 +26,14 @@
 - [ ] Update checkout.js for Stripe integration
 - [ ] Add payment form UI
 - [ ] Test payment flow
+
+# Push Notifications TODO
+
+- [x] Create notifications.js route with web-push integration
+- [x] Add VAPID keys configuration
+- [x] Implement subscription endpoint
+- [x] Implement send notification endpoint
+- [x] Add service worker for push handling
+- [x] Update frontend to request notification permission
+- [x] Add notification UI components
+- [x] Test push notification functionality

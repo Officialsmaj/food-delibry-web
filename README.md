@@ -219,8 +219,7 @@ For support, email support@famínaexpress.com or create an issue in this reposit
 
 - [x] Backend API integration
 - [x] Real payment processing
-- [ ] Push notifications
-- [ ] Advanced search and filters
+- [x] Push notifications
 - [ ] Restaurant owner dashboard
 - [ ] Delivery tracking with maps
 - [ ] Multi-language support

@@ -115,6 +115,40 @@ button {
     font-size: 0.8rem;
 }
 
+/* Notification Button */
+.notification-btn {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.notification-btn:hover {
+    background-color: rgba(255, 107, 53, 0.1);
+    color: #ff6b35;
+}
+
+.notification-btn.enabled {
+    color: #ff6b35;
+}
+
+.notification-btn.enabled::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 8px;
+    height: 8px;
+    background-color: #28a745;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
 .theme-toggle {
     background: none;
     border: none;

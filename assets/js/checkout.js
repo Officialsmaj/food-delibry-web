@@ -241,41 +241,115 @@ if (typeof showNotification === 'undefined') {
     }
 }
 
+// Initialize Stripe
+let stripe, elements;
+
+async function initializeStripe() {
+    // Load Stripe.js
+    if (!window.Stripe) {
+        const script = document.createElement('script');
+        script.src = 'https://js.stripe.com/v3/';
+        script.onload = () => {
+            stripe = window.Stripe('pk_test_your_publishable_key_here'); // Replace with your publishable key
+            elements = stripe.elements();
+            setupPaymentForm();
+        };
+        document.head.appendChild(script);
+    } else {
+        stripe = window.Stripe('pk_test_your_publishable_key_here'); // Replace with your publishable key
+        elements = stripe.elements();
+        setupPaymentForm();
+    }
+}
+
 // Setup Stripe payment form
 function setupPaymentForm() {
-    const cardElement = elements.create('card');
-    cardElement.mount('#card-element');
+    if (!stripe || !elements) return;
 
-    const form = document.getElementById('checkout-form');
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-
-        // Create payment intent
-        const response = await fetch(`${API_BASE}/payments/create-payment-intent`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+    const cardElement = elements.create('card', {
+        style: {
+            base: {
+                fontSize: '16px',
+                color: '#32325d',
+                fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+                fontSmoothing: 'antialiased',
+                '::placeholder': {
+                    color: '#aab7c4'
+                }
             },
-            body: JSON.stringify({ amount: localStorage.getItem('orderTotal') * 100 }) // Amount in cents
-        });
-
-        const { clientSecret } = await response.json();
-
-        // Confirm payment
-        const { error } = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: {
-                card: cardElement,
+            invalid: {
+                color: '#fa755a',
+                iconColor: '#fa755a'
             }
-        });
-
-        if (error) {
-            showNotification(error.message, 'error');
-        } else {
-            // Payment succeeded, proceed with order creation
-            await handleCheckout(event);
         }
     });
+
+    const cardElementContainer = document.getElementById('card-element');
+    if (cardElementContainer) {
+        cardElement.mount('#card-element');
+    }
+
+    const form = document.getElementById('checkout-form');
+    if (form) {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.disabled = true;
+            submitButton.textContent = 'Processing...';
+
+            try {
+                // Calculate total
+                const subtotal = await calculateCartTotal();
+                const deliveryFee = subtotal > 25 ? 0 : 2.99;
+                const tax = subtotal * 0.08;
+                const total = subtotal + deliveryFee + tax;
+
+                // Create payment intent
+                const response = await fetch(`${API_BASE}/payments/create-payment-intent`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ amount: Math.round(total * 100) }) // Amount in cents
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to create payment intent');
+                }
+
+                const { clientSecret } = await response.json();
+
+                // Confirm payment
+                const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                    payment_method: {
+                        card: cardElement,
+                        billing_details: {
+                            name: document.getElementById('name').value,
+                            email: document.getElementById('email').value,
+                        }
+                    }
+                });
+
+                if (error) {
+                    showNotification(error.message, 'error');
+                } else if (paymentIntent.status === 'succeeded') {
+                    // Payment succeeded, proceed with order creation
+                    await handleCheckout(event);
+                } else {
+                    showNotification('Payment failed. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Payment error:', error);
+                showNotification('Payment processing failed. Please try again.', 'error');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = originalText;
+            }
+        });
+    }
 }
 
 // Make functions globally available
