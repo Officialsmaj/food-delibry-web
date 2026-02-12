@@ -13,23 +13,79 @@
     <main>
         <section class="form-section">
             <div class="container">
-                <h2 class="smaj">Create Your Account</h2>
-                <form id="register-form">
+                <h2>Create Account</h2>
+
+                <!-- Account Type Selection -->
+                <div class="account-type-selector">
+                    <button type="button" id="customer-btn" class="account-type-btn active">Customer Account</button>
+                    <button type="button" id="restaurant-btn" class="account-type-btn">Restaurant Owner</button>
+                </div>
+
+                <!-- Customer Registration Form -->
+                <form id="customer-register-form" class="form active-form">
                     <div class="form-group">
-                        <label for="name">Full Name</label>
-                        <input type="text" id="name" name="name" required>
+                        <label for="customer-name">Full Name</label>
+                        <input type="text" id="customer-name" name="name" required>
                     </div>
                     <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required>
+                        <label for="customer-email">Email</label>
+                        <input type="email" id="customer-email" name="email" required>
                     </div>
                     <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" required>
+                        <label for="customer-password">Password</label>
+                        <input type="password" id="customer-password" name="password" required>
                     </div>
-                    <button type="submit" class="submit-btn">Register</button>
+                    <div class="form-group">
+                        <label for="customer-confirm-password">Confirm Password</label>
+                        <input type="password" id="customer-confirm-password" name="confirm-password" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Create Customer Account</button>
                 </form>
-                <p class="mt-2">Already have an account? <a href="login.html">Login here</a></p>
+
+                <!-- Restaurant Owner Registration Form -->
+                <form id="restaurant-register-form" class="form">
+                    <div class="form-group">
+                        <label for="owner-name">Full Name</label>
+                        <input type="text" id="owner-name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="owner-email">Email</label>
+                        <input type="email" id="owner-email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="owner-password">Password</label>
+                        <input type="password" id="owner-password" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="owner-confirm-password">Confirm Password</label>
+                        <input type="password" id="owner-confirm-password" name="confirm-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="restaurant-name">Restaurant Name</label>
+                        <input type="text" id="restaurant-name" name="restaurantName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="restaurant-cuisine">Cuisine Type</label>
+                        <select id="restaurant-cuisine" name="cuisine" required>
+                            <option value="">Select Cuisine</option>
+                            <option value="Italian">Italian</option>
+                            <option value="American">American</option>
+                            <option value="Asian">Asian</option>
+                            <option value="Mexican">Mexican</option>
+                            <option value="Indian">Indian</option>
+                            <option value="Chinese">Chinese</option>
+                            <option value="Mediterranean">Mediterranean</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="restaurant-description">Restaurant Description</label>
+                        <textarea id="restaurant-description" name="description" rows="3" placeholder="Describe your restaurant..."></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Create Restaurant Account</button>
+                </form>
+
+                <p class="text-center mt-2">Already have an account? <a href="login.html">Login here</a></p>
             </div>
         </section>
     </main>
