@@ -1,9 +1,15 @@
 // Main JavaScript file for general functionality
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Load header and footer components
-    loadComponent('header', 'components/header.html');
-    loadComponent('footer', 'components/footer.html');
+    // Load i18n first
+    const i18nScript = document.createElement('script');
+    i18nScript.src = 'assets/js/i18n.js';
+    i18nScript.onload = function() {
+        // Load header and footer components after i18n is loaded
+        loadComponent('header', 'components/header.html');
+        loadComponent('footer', 'components/footer.html');
+    };
+    document.head.appendChild(i18nScript);
 
     // Initialize cart count
     updateCartCount();

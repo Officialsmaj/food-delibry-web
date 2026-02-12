@@ -5,8 +5,8 @@
 - [x] Real payment processing (Stripe)
 - [x] Push notifications
 - [x] Advanced search and filters
+- [x] Restaurant owner dashboard
 
 ## Remaining Features 🚧
-- [ ] Restaurant owner dashboard
-- [ ] Delivery tracking with maps
+- [x] Delivery tracking with maps
 - [ ] Multi-language support

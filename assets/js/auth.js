@@ -1,250 +1,174 @@
-// Authentication functionality with API integration
+// Auth functionality for login and registration
 
 const API_BASE = 'http://localhost:3001/api';
 
-// Register a new user
-async function registerUser(userData) {
-    try {
-        const response = await fetch(`${API_BASE}/auth/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(userData)
-        });
-        const data = await response.json();
-        if (response.ok) {
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('currentUser', JSON.stringify(data.user));
-            showNotification('Registration successful! Please login.');
-            return true;
-        } else {
-            showNotification(data.message || 'Registration failed', 'error');
-            return false;
-        }
-    } catch (error) {
-        showNotification('Network error', 'error');
-        return false;
-    }
-}
-
-// Login user
-async function loginUser(email, password) {
-    try {
-        const response = await fetch(`${API_BASE}/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-        const data = await response.json();
-        if (response.ok) {
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('currentUser', JSON.stringify(data.user));
-            showNotification('Login successful!');
-            updateAuthStatus();
-            window.location.href = 'index.html';
-            return true;
-        } else {
-            showNotification(data.message || 'Login failed', 'error');
-            return false;
-        }
-    } catch (error) {
-        showNotification('Network error', 'error');
-        return false;
-    }
-}
-
-// Get current user
-async function getCurrentUser() {
-    const token = localStorage.getItem('token');
-    if (!token) return null;
-    try {
-        const response = await fetch(`${API_BASE}/auth/me`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await response.json();
-        if (response.ok) {
-            localStorage.setItem('currentUser', JSON.stringify(data.user));
-            return data.user;
-        } else {
-            localStorage.removeItem('token');
-            localStorage.removeItem('currentUser');
-            return null;
-        }
-    } catch (error) {
-        return null;
-    }
-}
-
-// Logout user
-async function logoutUser() {
-    try {
-        await fetch(`${API_BASE}/auth/logout`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        });
-    } catch (error) {
-        // Ignore errors
-    }
-    localStorage.removeItem('token');
-    localStorage.removeItem('currentUser');
-    showNotification('Logged out successfully!');
-    updateAuthStatus();
-    window.location.href = 'index.html';
-}
-
-// Check if user is logged in
-function isLoggedIn() {
-    return !!localStorage.getItem('token');
-}
-
-// Update user profile (simplified for now)
-function updateUserProfile(userData) {
-    // For now, just show notification - full profile update can be added later
-    showNotification('Profile update not implemented yet');
-    return false;
-}
-
-// Add order to user's history (API-based)
-async function addOrderToHistory(order) {
-    // This will be handled by the orders API
-    // For now, do nothing
-}
-
-// Get user's order history
-async function getUserOrderHistory() {
-    try {
-        const response = await fetch(`${API_BASE}/orders`, {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        });
-        const data = await response.json();
-        return response.ok ? data : [];
-    } catch (error) {
-        return [];
-    }
-}
-
-// Initialize auth forms
+// Handle login form submission
 document.addEventListener('DOMContentLoaded', function() {
-    // Register form
-    const registerForm = document.getElementById('register-form');
-    if (registerForm) {
-        registerForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            const userData = {
-                name: formData.get('name'),
-                email: formData.get('email'),
-                password: formData.get('password')
-            };
-
-            if (userData.name && userData.email && userData.password) {
-                if (validateEmail(userData.email)) {
-                    if (await registerUser(userData)) {
-                        this.reset();
-                    }
-                } else {
-                    showNotification('Please enter a valid email address.', 'error');
-                }
-            } else {
-                showNotification('Please fill in all fields.', 'error');
-            }
-        });
-    }
-
-    // Login form
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
-        loginForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            const email = formData.get('email');
-            const password = formData.get('password');
-
-            await loginUser(email, password);
-        });
+        loginForm.addEventListener('submit', handleLogin);
     }
 
-    // Profile form (simplified)
-    const profileForm = document.getElementById('profile-form');
-    if (profileForm) {
-        getCurrentUser().then(currentUser => {
-            if (currentUser) {
-                // Populate form with current user data
-                document.getElementById('profile-name').value = currentUser.name;
-                document.getElementById('profile-email').value = currentUser.email;
+    // Handle account type switching on register page
+    const customerBtn = document.getElementById('customer-btn');
+    const restaurantBtn = document.getElementById('restaurant-btn');
 
-                profileForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    const formData = new FormData(this);
-                    const userData = {
-                        name: formData.get('name'),
-                        email: formData.get('email')
-                    };
+    if (customerBtn && restaurantBtn) {
+        customerBtn.addEventListener('click', () => switchAccountType('customer'));
+        restaurantBtn.addEventListener('click', () => switchAccountType('restaurant'));
 
-                    if (userData.name && userData.email) {
-                        if (validateEmail(userData.email)) {
-                            updateUserProfile(userData);
-                        } else {
-                            showNotification('Please enter a valid email address.', 'error');
-                        }
-                    } else {
-                        showNotification('Please fill in name and email fields.', 'error');
-                    }
-                });
-            } else {
-                window.location.href = 'login.html';
-            }
-        });
-    }
+        // Handle form submissions
+        const customerForm = document.getElementById('customer-register-form');
+        const restaurantForm = document.getElementById('restaurant-register-form');
 
-    // Redirect if not logged in for protected pages
-    const protectedPages = ['profile.html', 'orders.html'];
-    if (protectedPages.includes(window.location.pathname.split('/').pop()) && !isLoggedIn()) {
-        window.location.href = 'login.html';
+        if (customerForm) {
+            customerForm.addEventListener('submit', (e) => handleRegister(e, 'customer'));
+        }
+
+        if (restaurantForm) {
+            restaurantForm.addEventListener('submit', (e) => handleRegister(e, 'restaurant'));
+        }
     }
 });
 
-// Helper functions (fallback if not loaded from utils)
-if (typeof validateEmail === 'undefined') {
-    function validateEmail(email) {
-        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return re.test(email);
+// Switch between account types
+function switchAccountType(type) {
+    const customerBtn = document.getElementById('customer-btn');
+    const restaurantBtn = document.getElementById('restaurant-btn');
+    const customerForm = document.getElementById('customer-register-form');
+    const restaurantForm = document.getElementById('restaurant-register-form');
+
+    if (type === 'customer') {
+        customerBtn.classList.add('active');
+        restaurantBtn.classList.remove('active');
+        customerForm.classList.add('active-form');
+        restaurantForm.classList.remove('active-form');
+    } else {
+        restaurantBtn.classList.add('active');
+        customerBtn.classList.remove('active');
+        restaurantForm.classList.add('active-form');
+        customerForm.classList.remove('active-form');
     }
 }
 
-if (typeof showNotification === 'undefined') {
-    function showNotification(message, type = 'info') {
-        alert(message);
-    }
-}
+// Login function
+async function handleLogin(e) {
+    e.preventDefault();
 
-if (typeof updateAuthStatus === 'undefined') {
-    function updateAuthStatus() {
-        // This function is defined in main.js, but as a fallback
-        getCurrentUser().then(user => {
-            const authLinks = document.getElementById('auth-links');
-            if (authLinks) {
-                if (user) {
-                    authLinks.innerHTML = `
-                        <a href="profile.html">${user.name}</a>
-                        <a href="#" onclick="logoutUser()">Logout</a>
-                    `;
-                } else {
-                    authLinks.innerHTML = `
-                        <a href="login.html">Login</a>
-                        <a href="register.html">Register</a>
-                    `;
-                }
-            }
+    const formData = new FormData(e.target);
+    const loginData = {
+        email: formData.get('email'),
+        password: formData.get('password')
+    };
+
+    try {
+        const response = await fetch(`${API_BASE}/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(loginData)
         });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('currentUser', JSON.stringify(data.user));
+
+            showNotification('Login successful!');
+
+            // Redirect based on user role
+            if (data.user.role === 'restaurant_owner') {
+                window.location.href = 'restaurant-owner-dashboard.html';
+            } else {
+                window.location.href = 'index.html';
+            }
+        } else {
+            showNotification(data.message || 'Login failed', 'error');
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        showNotification('Network error', 'error');
     }
 }
 
-// Make functions globally available
-window.registerUser = registerUser;
-window.loginUser = loginUser;
-window.logoutUser = logoutUser;
-window.getCurrentUser = getCurrentUser;
-window.isLoggedIn = isLoggedIn;
-window.updateUserProfile = updateUserProfile;
-window.addOrderToHistory = addOrderToHistory;
-window.getUserOrderHistory = getUserOrderHistory;
+// Register function
+async function handleRegister(e, accountType) {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    let registerData;
+
+    if (accountType === 'customer') {
+        registerData = {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            password: formData.get('password')
+        };
+
+        // Check password confirmation
+        const confirmPassword = formData.get('confirm-password');
+        if (registerData.password !== confirmPassword) {
+            showNotification('Passwords do not match', 'error');
+            return;
+        }
+
+        // Use customer registration endpoint
+        const response = await fetch(`${API_BASE}/auth/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(registerData)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showNotification('Customer account created successfully! Please login.');
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000);
+        } else {
+            showNotification(data.message || 'Registration failed', 'error');
+        }
+
+    } else if (accountType === 'restaurant') {
+        registerData = {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            password: formData.get('password'),
+            restaurantName: formData.get('restaurantName'),
+            cuisine: formData.get('cuisine'),
+            description: formData.get('description')
+        };
+
+        // Check password confirmation
+        const confirmPassword = formData.get('confirm-password');
+        if (registerData.password !== confirmPassword) {
+            showNotification('Passwords do not match', 'error');
+            return;
+        }
+
+        // Use restaurant owner registration endpoint
+        const response = await fetch(`${API_BASE}/auth/register-owner`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(registerData)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showNotification('Restaurant account created successfully! Please login.');
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000);
+        } else {
+            showNotification(data.message || 'Registration failed', 'error');
+        }
+    }
+}

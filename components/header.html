@@ -1,36 +1,63 @@
-<header class="header">
-    <div class="container">
-        <div class="logo">
-            <a href="index.html">FAMI-NA Express</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAMI-NA Express - Header</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="index.html">
+                        <h1>FAMI-NA Express</h1>
+                    </a>
+                </div>
+                <div class="nav">
+                    <div class="nav-links">
+                        <a href="index.html" data-i18n="nav.home">Home</a>
+                        <a href="menu.html" data-i18n="nav.menu">Menu</a>
+                        <a href="restaurant.html" data-i18n="nav.restaurants">Restaurants</a>
+                        <a href="cart.html" data-i18n="nav.cart">Cart</a>
+                        <a href="orders.html" data-i18n="nav.orders">Orders</a>
+                    </div>
+                    <div class="nav-auth" id="auth-links">
+                        <a href="login.html" data-i18n="nav.login">Login</a>
+                        <a href="register.html" data-i18n="nav.register">Register</a>
+                    </div>
+                    <div class="language-selector">
+                        <select id="language-select">
+                            <option value="en">English</option>
+                            <option value="es">Español</option>
+                        </select>
+                    </div>
+                    <div class="hamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <nav class="nav">
-            <button class="close-menu">&times;</button>
-            <ul class="nav-list">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="menu.html">Menu</a></li>
-                <li><a href="restaurant.html">Restaurants</a></li>
-                <li><a href="about.html">About Us</a></li>
-                <li><a href="cart.html">Cart <span id="cart-count">0</span></a></li>
-                <li><a href="orders.html">Orders</a></li>
-                <li><a href="profile.html">Profile</a></li>
-                <li>
-                    <button id="notification-btn" class="notification-btn" title="Enable Notifications">
-                        <i class="fas fa-bell"></i>
-                    </button>
-                </li>
-                <li id="auth-links">
-                    <a href="login.html">Login</a>
-                    <a href="register.html">Register</a>
-                </li>
-            </ul>
-        </nav>
-        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
-            <i class="fas fa-moon"></i>
-        </button>
-        <div class="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    </div>
-</header>
+    </header>
+
+    <script src="../assets/js/i18n.js"></script>
+    <script>
+        // Language selector functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const languageSelect = document.getElementById('language-select');
+            if (languageSelect) {
+                // Set current language
+                languageSelect.value = i18n.getCurrentLanguage();
+
+                // Handle language change
+                languageSelect.addEventListener('change', function() {
+                    i18n.setLanguage(this.value);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
