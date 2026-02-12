@@ -1,69 +1,91 @@
-// Authentication functionality
+// Authentication functionality with API integration
 
-// User data storage key
-const USERS_KEY = 'foodieUsers';
-const CURRENT_USER_KEY = 'currentUser';
-
-// Get users from localStorage
-function getUsers() {
-    return JSON.parse(localStorage.getItem(USERS_KEY)) || [];
-}
-
-// Save users to localStorage
-function saveUsers(users) {
-    localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
+const API_BASE = 'http://localhost:3001/api';
 
 // Register a new user
-function registerUser(userData) {
-    const users = getUsers();
-
-    // Check if user already exists
-    if (users.find(user => user.email === userData.email)) {
-        showNotification('User with this email already exists!', 'error');
+async function registerUser(userData) {
+    try {
+        const response = await fetch(`${API_BASE}/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData)
+        });
+        const data = await response.json();
+        if (response.ok) {
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('currentUser', JSON.stringify(data.user));
+            showNotification('Registration successful! Please login.');
+            return true;
+        } else {
+            showNotification(data.message || 'Registration failed', 'error');
+            return false;
+        }
+    } catch (error) {
+        showNotification('Network error', 'error');
         return false;
     }
-
-    // Create new user
-    const newUser = {
-        id: generateId(),
-        name: userData.name,
-        email: userData.email,
-        password: userData.password, // In a real app, this should be hashed
-        orders: []
-    };
-
-    users.push(newUser);
-    saveUsers(users);
-    showNotification('Registration successful! Please login.');
-    return true;
 }
 
 // Login user
-function loginUser(email, password) {
-    const users = getUsers();
-    const user = users.find(u => u.email === email && u.password === password);
-
-    if (user) {
-        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-        showNotification('Login successful!');
-        updateAuthStatus();
-        window.location.href = 'index.html';
-        return true;
-    } else {
-        showNotification('Invalid email or password!', 'error');
+async function loginUser(email, password) {
+    try {
+        const response = await fetch(`${API_BASE}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await response.json();
+        if (response.ok) {
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('currentUser', JSON.stringify(data.user));
+            showNotification('Login successful!');
+            updateAuthStatus();
+            window.location.href = 'index.html';
+            return true;
+        } else {
+            showNotification(data.message || 'Login failed', 'error');
+            return false;
+        }
+    } catch (error) {
+        showNotification('Network error', 'error');
         return false;
     }
 }
 
 // Get current user
-function getCurrentUser() {
-    return JSON.parse(localStorage.getItem(CURRENT_USER_KEY));
+async function getCurrentUser() {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+    try {
+        const response = await fetch(`${API_BASE}/auth/me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        if (response.ok) {
+            localStorage.setItem('currentUser', JSON.stringify(data.user));
+            return data.user;
+        } else {
+            localStorage.removeItem('token');
+            localStorage.removeItem('currentUser');
+            return null;
+        }
+    } catch (error) {
+        return null;
+    }
 }
 
 // Logout user
-function logoutUser() {
-    localStorage.removeItem(CURRENT_USER_KEY);
+async function logoutUser() {
+    try {
+        await fetch(`${API_BASE}/auth/logout`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+    } catch (error) {
+        // Ignore errors
+    }
+    localStorage.removeItem('token');
+    localStorage.removeItem('currentUser');
     showNotification('Logged out successfully!');
     updateAuthStatus();
     window.location.href = 'index.html';
@@ -71,50 +93,33 @@ function logoutUser() {
 
 // Check if user is logged in
 function isLoggedIn() {
-    return getCurrentUser() !== null;
+    return !!localStorage.getItem('token');
 }
 
-// Update user profile
+// Update user profile (simplified for now)
 function updateUserProfile(userData) {
-    const currentUser = getCurrentUser();
-    if (!currentUser) return false;
-
-    const users = getUsers();
-    const userIndex = users.findIndex(u => u.id === currentUser.id);
-
-    if (userIndex !== -1) {
-        users[userIndex] = { ...users[userIndex], ...userData };
-        saveUsers(users);
-        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(users[userIndex]));
-        showNotification('Profile updated successfully!');
-        return true;
-    }
-
+    // For now, just show notification - full profile update can be added later
+    showNotification('Profile update not implemented yet');
     return false;
 }
 
-// Add order to user's history
-function addOrderToHistory(order) {
-    const currentUser = getCurrentUser();
-    if (!currentUser) return;
-
-    const users = getUsers();
-    const userIndex = users.findIndex(u => u.id === currentUser.id);
-
-    if (userIndex !== -1) {
-        if (!users[userIndex].orders) {
-            users[userIndex].orders = [];
-        }
-        users[userIndex].orders.push(order);
-        saveUsers(users);
-        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(users[userIndex]));
-    }
+// Add order to user's history (API-based)
+async function addOrderToHistory(order) {
+    // This will be handled by the orders API
+    // For now, do nothing
 }
 
 // Get user's order history
-function getUserOrderHistory() {
-    const currentUser = getCurrentUser();
-    return currentUser ? currentUser.orders || [] : [];
+async function getUserOrderHistory() {
+    try {
+        const response = await fetch(`${API_BASE}/orders`, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+        const data = await response.json();
+        return response.ok ? data : [];
+    } catch (error) {
+        return [];
+    }
 }
 
 // Initialize auth forms
@@ -122,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Register form
     const registerForm = document.getElementById('register-form');
     if (registerForm) {
-        registerForm.addEventListener('submit', function(e) {
+        registerForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const formData = new FormData(this);
             const userData = {
@@ -133,8 +138,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (userData.name && userData.email && userData.password) {
                 if (validateEmail(userData.email)) {
-                    registerUser(userData);
-                    this.reset();
+                    if (await registerUser(userData)) {
+                        this.reset();
+                    }
                 } else {
                     showNotification('Please enter a valid email address.', 'error');
                 }
@@ -147,96 +153,47 @@ document.addEventListener('DOMContentLoaded', function() {
     // Login form
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
+        loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const formData = new FormData(this);
             const email = formData.get('email');
             const password = formData.get('password');
 
-            loginUser(email, password);
+            await loginUser(email, password);
         });
     }
 
-    // Profile form
+    // Profile form (simplified)
     const profileForm = document.getElementById('profile-form');
     if (profileForm) {
-        const currentUser = getCurrentUser();
-        if (currentUser) {
-            // Populate form with current user data
-            document.getElementById('profile-name').value = currentUser.name;
-            document.getElementById('profile-email').value = currentUser.email;
+        getCurrentUser().then(currentUser => {
+            if (currentUser) {
+                // Populate form with current user data
+                document.getElementById('profile-name').value = currentUser.name;
+                document.getElementById('profile-email').value = currentUser.email;
 
-            // Load profile picture if exists
-            const profilePic = document.getElementById('profile-picture');
-            if (currentUser.profilePicture) {
-                profilePic.src = currentUser.profilePicture;
-            }
+                profileForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    const userData = {
+                        name: formData.get('name'),
+                        email: formData.get('email')
+                    };
 
-            // Handle profile picture upload
-            const pictureInput = document.getElementById('profile-picture-input');
-            if (pictureInput) {
-                pictureInput.addEventListener('change', function(e) {
-                    const file = e.target.files[0];
-                    if (file) {
-                        // Validate file type
-                        if (!file.type.startsWith('image/')) {
-                            showNotification('Please select a valid image file.', 'error');
-                            return;
-                        }
-
-                        // Validate file size (max 5MB)
-                        if (file.size > 5 * 1024 * 1024) {
-                            showNotification('Image size should be less than 5MB.', 'error');
-                            return;
-                        }
-
-                        const reader = new FileReader();
-                        reader.onload = function(event) {
-                            profilePic.src = event.target.result;
-                            // Store the base64 data temporarily
-                            profilePic.dataset.tempImage = event.target.result;
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                });
-            }
-
-            profileForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const formData = new FormData(this);
-                const userData = {
-                    name: formData.get('name'),
-                    email: formData.get('email'),
-                    currentPassword: formData.get('currentPassword'),
-                    newPassword: formData.get('newPassword'),
-                    confirmPassword: formData.get('confirmPassword')
-                };
-
-                // Add profile picture if changed
-                if (profilePic.dataset.tempImage) {
-                    userData.profilePicture = profilePic.dataset.tempImage;
-                }
-
-                if (userData.name && userData.email) {
-                    if (validateEmail(userData.email)) {
-                        if (updateUserProfile(userData)) {
-                            // Clear temporary data
-                            delete profilePic.dataset.tempImage;
-                            // Clear password fields
-                            document.getElementById('current-password').value = '';
-                            document.getElementById('new-password').value = '';
-                            document.getElementById('confirm-password').value = '';
+                    if (userData.name && userData.email) {
+                        if (validateEmail(userData.email)) {
+                            updateUserProfile(userData);
+                        } else {
+                            showNotification('Please enter a valid email address.', 'error');
                         }
                     } else {
-                        showNotification('Please enter a valid email address.', 'error');
+                        showNotification('Please fill in name and email fields.', 'error');
                     }
-                } else {
-                    showNotification('Please fill in name and email fields.', 'error');
-                }
-            });
-        } else {
-            window.location.href = 'login.html';
-        }
+                });
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
     }
 
     // Redirect if not logged in for protected pages
@@ -247,12 +204,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Helper functions (fallback if not loaded from utils)
-if (typeof generateId === 'undefined') {
-    function generateId() {
-        return Date.now().toString(36) + Math.random().toString(36).substr(2);
-    }
-}
-
 if (typeof validateEmail === 'undefined') {
     function validateEmail(email) {
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -269,21 +220,22 @@ if (typeof showNotification === 'undefined') {
 if (typeof updateAuthStatus === 'undefined') {
     function updateAuthStatus() {
         // This function is defined in main.js, but as a fallback
-        const user = getCurrentUser();
-        const authLinks = document.getElementById('auth-links');
-        if (authLinks) {
-            if (user) {
-                authLinks.innerHTML = `
-                    <a href="profile.html">${user.name}</a>
-                    <a href="#" onclick="logoutUser()">Logout</a>
-                `;
-            } else {
-                authLinks.innerHTML = `
-                    <a href="login.html">Login</a>
-                    <a href="register.html">Register</a>
-                `;
+        getCurrentUser().then(user => {
+            const authLinks = document.getElementById('auth-links');
+            if (authLinks) {
+                if (user) {
+                    authLinks.innerHTML = `
+                        <a href="profile.html">${user.name}</a>
+                        <a href="#" onclick="logoutUser()">Logout</a>
+                    `;
+                } else {
+                    authLinks.innerHTML = `
+                        <a href="login.html">Login</a>
+                        <a href="register.html">Register</a>
+                    `;
+                }
             }
-        }
+        });
     }
 }
 

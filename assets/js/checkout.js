@@ -1,8 +1,10 @@
-// Checkout functionality
+// Checkout functionality with API integration
+
+const API_BASE = 'http://localhost:3001/api';
 
 // Render order summary
-function renderOrderSummary() {
-    const cart = getCart();
+async function renderOrderSummary() {
+    const cart = await getCart();
     const orderSummary = document.getElementById('order-summary');
 
     if (!orderSummary) return;
@@ -12,7 +14,7 @@ function renderOrderSummary() {
         return;
     }
 
-    const subtotal = calculateCartTotal();
+    const subtotal = await calculateCartTotal();
     const deliveryFee = subtotal > 25 ? 0 : 2.99; // Free delivery over $25
     const tax = subtotal * 0.08; // 8% tax
     const total = subtotal + deliveryFee + tax;
@@ -48,10 +50,10 @@ function renderOrderSummary() {
 }
 
 // Handle checkout form submission
-function handleCheckout(e) {
+async function handleCheckout(e) {
     e.preventDefault();
 
-    const cart = getCart();
+    const cart = await getCart();
     if (cart.length === 0) {
         showNotification('Your cart is empty!', 'error');
         return;
@@ -89,54 +91,76 @@ function handleCheckout(e) {
         return;
     }
 
-    // Create order
-    const order = {
-        id: generateId(),
-        items: cart,
-        deliveryInfo: deliveryInfo,
-        total: parseFloat(localStorage.getItem('orderTotal')),
-        status: 'pending',
-        date: new Date().toISOString()
-    };
+    // Calculate total
+    const subtotal = await calculateCartTotal();
+    const deliveryFee = subtotal > 25 ? 0 : 2.99;
+    const tax = subtotal * 0.08;
+    const total = subtotal + deliveryFee + tax;
 
-    // Add order to user's history
-    addOrderToHistory(order);
+    try {
+        // Create order via API
+        const response = await fetch(`${API_BASE}/orders`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({
+                items: cart,
+                total: total,
+                paymentMethod: 'card' // Default for now
+            })
+        });
 
-    // Clear cart
-    clearCart();
-
-    // Store order for confirmation page (if exists)
-    localStorage.setItem('lastOrder', JSON.stringify(order));
-
-    showNotification('Order placed successfully!');
-    window.location.href = 'orders.html';
+        if (response.ok) {
+            const order = await response.json();
+            // Clear cart
+            // Note: Cart clearing would be handled by the API in a real implementation
+            showNotification('Order placed successfully!');
+            window.location.href = 'orders.html';
+        } else {
+            showNotification('Failed to place order', 'error');
+        }
+    } catch (error) {
+        showNotification('Network error', 'error');
+    }
 }
 
 // Render orders history
-function renderOrdersHistory() {
-    const orders = getUserOrderHistory();
-    const ordersContainer = document.getElementById('orders-container');
+async function renderOrdersHistory() {
+    try {
+        const response = await fetch(`${API_BASE}/orders`, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+        const orders = response.ok ? await response.json() : [];
+        const ordersContainer = document.getElementById('orders-container');
 
-    if (!ordersContainer) return;
+        if (!ordersContainer) return;
 
-    if (orders.length === 0) {
-        ordersContainer.innerHTML = '<p>You haven\'t placed any orders yet.</p>';
-        return;
+        if (orders.length === 0) {
+            ordersContainer.innerHTML = '<p>You haven\'t placed any orders yet.</p>';
+            return;
+        }
+
+        ordersContainer.innerHTML = orders.reverse().map(order => `
+            <div class="order-card">
+                <h3>Order #${order.id}</h3>
+                <p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}</p>
+                <p><strong>Status:</strong> ${capitalize(order.status)}</p>
+                <p><strong>Total:</strong> ${formatPrice(order.total)}</p>
+                <p><strong>Items:</strong></p>
+                <ul>
+                    ${order.items.map(item => `<li>${item.name} x${item.quantity}</li>`).join('')}
+                </ul>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        const ordersContainer = document.getElementById('orders-container');
+        if (ordersContainer) {
+            ordersContainer.innerHTML = '<p>Error loading orders.</p>';
+        }
     }
-
-    ordersContainer.innerHTML = orders.reverse().map(order => `
-        <div class="order-card">
-            <h3>Order #${order.id.slice(-8)}</h3>
-            <p><strong>Date:</strong> ${new Date(order.date).toLocaleDateString()}</p>
-            <p><strong>Status:</strong> ${capitalize(order.status)}</p>
-            <p><strong>Total:</strong> ${formatPrice(order.total)}</p>
-            <p><strong>Items:</strong></p>
-            <ul>
-                ${order.items.map(item => `<li>${item.name} x${item.quantity}</li>`).join('')}
-            </ul>
-            <p><strong>Delivery Address:</strong> ${order.deliveryInfo.address}, ${order.deliveryInfo.city}</p>
-        </div>
-    `).join('');
 }
 
 // Initialize checkout functionality
@@ -160,54 +184,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Helper functions (fallback if not loaded from utils/cart/auth)
 if (typeof getCart === 'undefined') {
-    function getCart() {
-        return JSON.parse(localStorage.getItem('cart')) || [];
+    async function getCart() {
+        try {
+            const response = await fetch(`${API_BASE}/cart`, {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            return response.ok ? await response.json() : [];
+        } catch (error) {
+            return [];
+        }
     }
 }
 
 if (typeof calculateCartTotal === 'undefined') {
-    function calculateCartTotal() {
-        const cart = getCart();
+    async function calculateCartTotal() {
+        const cart = await getCart();
         return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
     }
 }
 
 if (typeof clearCart === 'undefined') {
     function clearCart() {
-        localStorage.setItem('cart', JSON.stringify([]));
-        if (typeof updateCartCount !== 'undefined') updateCartCount();
+        // Cart clearing via API not implemented yet
+        showNotification('Clear cart not implemented yet');
     }
 }
 
 if (typeof isLoggedIn === 'undefined') {
     function isLoggedIn() {
-        return localStorage.getItem('currentUser') !== null;
-    }
-}
-
-if (typeof addOrderToHistory === 'undefined') {
-    function addOrderToHistory(order) {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        if (!currentUser) return;
-
-        const users = JSON.parse(localStorage.getItem('foodieUsers')) || [];
-        const userIndex = users.findIndex(u => u.id === currentUser.id);
-
-        if (userIndex !== -1) {
-            if (!users[userIndex].orders) {
-                users[userIndex].orders = [];
-            }
-            users[userIndex].orders.push(order);
-            localStorage.setItem('foodieUsers', JSON.stringify(users));
-            localStorage.setItem('currentUser', JSON.stringify(users[userIndex]));
-        }
-    }
-}
-
-if (typeof getUserOrderHistory === 'undefined') {
-    function getUserOrderHistory() {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        return currentUser ? currentUser.orders || [] : [];
+        return !!localStorage.getItem('token');
     }
 }
 
@@ -224,12 +229,6 @@ if (typeof validateEmail === 'undefined') {
     }
 }
 
-if (typeof generateId === 'undefined') {
-    function generateId() {
-        return Date.now().toString(36) + Math.random().toString(36).substr(2);
-    }
-}
-
 if (typeof capitalize === 'undefined') {
     function capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
@@ -240,6 +239,43 @@ if (typeof showNotification === 'undefined') {
     function showNotification(message, type = 'info') {
         alert(message);
     }
+}
+
+// Setup Stripe payment form
+function setupPaymentForm() {
+    const cardElement = elements.create('card');
+    cardElement.mount('#card-element');
+
+    const form = document.getElementById('checkout-form');
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        // Create payment intent
+        const response = await fetch(`${API_BASE}/payments/create-payment-intent`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({ amount: localStorage.getItem('orderTotal') * 100 }) // Amount in cents
+        });
+
+        const { clientSecret } = await response.json();
+
+        // Confirm payment
+        const { error } = await stripe.confirmCardPayment(clientSecret, {
+            payment_method: {
+                card: cardElement,
+            }
+        });
+
+        if (error) {
+            showNotification(error.message, 'error');
+        } else {
+            // Payment succeeded, proceed with order creation
+            await handleCheckout(event);
+        }
+    });
 }
 
 // Make functions globally available

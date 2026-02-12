@@ -1,84 +1,107 @@
-// Cart management functionality
+i// Cart management functionality with API integration
 
-// Get cart from localStorage
-function getCart() {
-    return JSON.parse(localStorage.getItem('cart')) || [];
-}
+const API_BASE = 'http://localhost:3001/api';
 
-// Save cart to localStorage
-function saveCart(cart) {
-    localStorage.setItem('cart', JSON.stringify(cart));
-    updateCartCount();
+// Get cart from API
+async function getCart() {
+    try {
+        const response = await fetch(`${API_BASE}/cart`, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+        const cart = await response.json();
+        return response.ok ? cart : [];
+    } catch (error) {
+        console.error('Error fetching cart:', error);
+        return [];
+    }
 }
 
 // Add item to cart
-function addToCart(itemId, quantity = 1) {
-    const cart = getCart();
-    const existingItem = cart.find(item => item.id === itemId);
-
-    if (existingItem) {
-        existingItem.quantity += quantity;
-    } else {
-        const menuItem = menuItems.find(item => item.id === itemId);
-        if (menuItem) {
-            cart.push({
-                id: menuItem.id,
-                name: menuItem.name,
-                price: menuItem.price,
-                image: menuItem.image,
-                quantity: quantity
-            });
+async function addToCart(itemId, quantity = 1) {
+    try {
+        const response = await fetch(`${API_BASE}/cart`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({ itemId, quantity })
+        });
+        if (response.ok) {
+            updateCartCount();
+            showNotification(`${quantity} item(s) added to cart!`);
+        } else {
+            showNotification('Failed to add item to cart', 'error');
         }
+    } catch (error) {
+        showNotification('Network error', 'error');
     }
-
-    saveCart(cart);
-    showNotification(`${quantity} item(s) added to cart!`);
 }
 
 // Remove item from cart
-function removeFromCart(itemId) {
-    const cart = getCart();
-    const updatedCart = cart.filter(item => item.id !== itemId);
-    saveCart(updatedCart);
-    showNotification('Item removed from cart!');
+async function removeFromCart(itemId) {
+    try {
+        const response = await fetch(`${API_BASE}/cart/${itemId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+        if (response.ok) {
+            updateCartCount();
+            showNotification('Item removed from cart!');
+        } else {
+            showNotification('Failed to remove item', 'error');
+        }
+    } catch (error) {
+        showNotification('Network error', 'error');
+    }
 }
 
 // Update item quantity in cart
-function updateCartItemQuantity(itemId, newQuantity) {
+async function updateCartItemQuantity(itemId, newQuantity) {
     if (newQuantity <= 0) {
         removeFromCart(itemId);
         return;
     }
 
-    const cart = getCart();
-    const item = cart.find(item => item.id === itemId);
-    if (item) {
-        item.quantity = newQuantity;
-        saveCart(cart);
+    try {
+        const response = await fetch(`${API_BASE}/cart/${itemId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({ quantity: newQuantity })
+        });
+        if (response.ok) {
+            updateCartCount();
+        } else {
+            showNotification('Failed to update quantity', 'error');
+        }
+    } catch (error) {
+        showNotification('Network error', 'error');
     }
 }
 
 // Calculate cart total
-function calculateCartTotal() {
-    const cart = getCart();
+async function calculateCartTotal() {
+    const cart = await getCart();
     return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 }
 
-// Clear cart
+// Clear cart (not implemented in API yet)
 function clearCart() {
-    saveCart([]);
-    showNotification('Cart cleared!');
+    showNotification('Clear cart not implemented yet');
 }
 
 // Get cart item count
-function getCartItemCount() {
-    const cart = getCart();
+async function getCartItemCount() {
+    const cart = await getCart();
     return cart.reduce((total, item) => total + item.quantity, 0);
 }
 
 // Update cart count in header (if main.js is loaded)
-function updateCartCount() {
-    const count = getCartItemCount();
+async function updateCartCount() {
+    const count = await getCartItemCount();
     const cartCountElement = document.getElementById('cart-count');
     if (cartCountElement) {
         cartCountElement.textContent = count;
@@ -86,8 +109,8 @@ function updateCartCount() {
 }
 
 // Render cart items (for cart.html)
-function renderCartItems() {
-    const cart = getCart();
+async function renderCartItems() {
+    const cart = await getCart();
     const cartContainer = document.getElementById('cart-items');
 
     if (!cartContainer) return;
@@ -118,8 +141,8 @@ function renderCartItems() {
 }
 
 // Update cart total display
-function updateCartTotal() {
-    const total = calculateCartTotal();
+async function updateCartTotal() {
+    const total = await calculateCartTotal();
     const totalElement = document.getElementById('cart-total');
     if (totalElement) {
         totalElement.textContent = `Total: ${formatPrice(total)}`;
@@ -131,6 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (document.getElementById('cart-items')) {
         renderCartItems();
     }
+    updateCartCount(); // Update count on load
 });
 
 // Helper functions (fallback if not loaded from utils)

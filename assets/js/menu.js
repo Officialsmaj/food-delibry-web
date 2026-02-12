@@ -1,16 +1,47 @@
-// Menu filtering and display functionality
+// Menu filtering and display functionality with API integration
+
+const API_BASE = 'http://localhost:3001/api';
+
+let categories = [];
+let restaurants = [];
+let menuItems = [];
+
+// Load data from API
+async function loadData() {
+    try {
+        const [categoriesRes, restaurantsRes, menuRes] = await Promise.all([
+            fetch(`${API_BASE}/menu`), // We'll use menu endpoint to get categories
+            fetch(`${API_BASE}/restaurants`),
+            fetch(`${API_BASE}/menu`)
+        ]);
+
+        if (categoriesRes.ok) {
+            const menuData = await categoriesRes.json();
+            // Extract unique categories from menu items
+            categories = [...new Set(menuData.map(item => item.category))].map(name => ({ name }));
+            categories.unshift({ name: 'all' }); // Add 'all' category
+        }
+
+        if (restaurantsRes.ok) {
+            restaurants = await restaurantsRes.json();
+        }
+
+        if (menuRes.ok) {
+            menuItems = await menuRes.json();
+        }
+    } catch (error) {
+        console.error('Error loading data:', error);
+    }
+}
 
 // Render categories for filtering
 function renderCategories() {
     const categoriesContainer = document.getElementById('categories-filter');
     if (!categoriesContainer) return;
 
-    categoriesContainer.innerHTML = `
-        <button class="filter-btn active" data-category="all">All</button>
-        ${categories.map(category => `
-            <button class="filter-btn" data-category="${category.name}">${category.name}</button>
-        `).join('')}
-    `;
+    categoriesContainer.innerHTML = categories.map(category => `
+        <button class="filter-btn ${category.name === 'all' ? 'active' : ''}" data-category="${category.name}">${category.name === 'all' ? 'All' : category.name}</button>
+    `).join('');
 
     // Add event listeners
     const filterButtons = categoriesContainer.querySelectorAll('.filter-btn');
@@ -79,7 +110,9 @@ function renderRestaurants() {
 }
 
 // Initialize menu page
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
+    await loadData();
+
     // Render categories and menu items on menu.html
     if (document.getElementById('categories-filter')) {
         renderCategories();
@@ -113,29 +146,25 @@ if (typeof formatPrice === 'undefined') {
 }
 
 if (typeof addToCart === 'undefined') {
-    function addToCart(itemId, quantity = 1) {
-        // Fallback implementation
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        const existingItem = cart.find(item => item.id === itemId);
-
-        if (existingItem) {
-            existingItem.quantity += quantity;
-        } else {
-            const menuItem = menuItems.find(item => item.id === itemId);
-            if (menuItem) {
-                cart.push({
-                    id: menuItem.id,
-                    name: menuItem.name,
-                    price: menuItem.price,
-                    image: menuItem.image,
-                    quantity: quantity
-                });
+    async function addToCart(itemId, quantity = 1) {
+        try {
+            const response = await fetch(`${API_BASE}/cart`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({ itemId, quantity })
+            });
+            if (response.ok) {
+                if (typeof updateCartCount !== 'undefined') updateCartCount();
+                if (typeof showNotification !== 'undefined') showNotification(`${quantity} item(s) added to cart!`);
+            } else {
+                if (typeof showNotification !== 'undefined') showNotification('Failed to add to cart', 'error');
             }
+        } catch (error) {
+            if (typeof showNotification !== 'undefined') showNotification('Network error', 'error');
         }
-
-        localStorage.setItem('cart', JSON.stringify(cart));
-        if (typeof updateCartCount !== 'undefined') updateCartCount();
-        if (typeof showNotification !== 'undefined') showNotification(`${quantity} item(s) added to cart!`);
     }
 }
 

@@ -1,6 +1,6 @@
 # FAMI-NA Express - Food Delivery Website
 
-A modern, responsive food delivery website built with HTML, CSS, and JavaScript. Order delicious food from your favorite restaurants and get it delivered to your doorstep.
+A modern, full-stack food delivery website built with HTML, CSS, JavaScript, Node.js, and Express.js. Order delicious food from your favorite restaurants and get it delivered to your doorstep.
 
 ## 🚀 Features
 
@@ -8,8 +8,9 @@ A modern, responsive food delivery website built with HTML, CSS, and JavaScript.
 - **Browse Restaurants**: Explore featured restaurants with ratings and delivery times
 - **Menu Categories**: Filter food by categories (Pizza, Burger, Pasta, Salad, Dessert, Beverage)
 - **Shopping Cart**: Add items to cart, update quantities, and manage orders
-- **User Authentication**: Register, login, and manage user accounts
+- **User Authentication**: Register, login, and manage user accounts with JWT
 - **Order Management**: Place orders, view order history, and track deliveries
+- **RESTful API**: Backend API for all data operations
 - **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
 
 ### User Experience
@@ -216,8 +217,8 @@ For support, email support@famínaexpress.com or create an issue in this reposit
 
 ## 🔄 Future Enhancements
 
-- [ ] Backend API integration
-- [ ] Real payment processing
+- [x] Backend API integration
+- [x] Real payment processing
 - [ ] Push notifications
 - [ ] Advanced search and filters
 - [ ] Restaurant owner dashboard

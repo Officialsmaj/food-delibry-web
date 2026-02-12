@@ -1,31 +1,28 @@
-# COMPLETED: Change FoodieExpress to FAMI-NA Express
+# Backend API Integration TODO
 
-- [x] Update components/header.html
-- [x] Update components/footer.html
-- [x] Update index.html
-- [x] Update menu.html
-- [x] Update restaurant.html
-- [x] Update cart.html
-- [x] Update login.html
-- [x] Update register.html
-- [x] Update profile.html
-- [x] Update contact.html
-- [x] Update faq.html
-- [x] Update privacy.html
-- [x] Update terms.html
-- [x] Update orders.html
-- [x] Update checkout.html
-- [x] Update 404.html
-- [x] Update assets/js/menu.js
+- [x] Create backend/ directory
+- [x] Create package.json with Express, CORS, JWT, etc.
+- [x] Create server.js for Express server setup
+- [x] Create routes/auth.js for authentication API
+- [x] Create routes/restaurants.js for restaurants API
+- [x] Create routes/menu.js for menu API
+- [x] Create routes/cart.js for cart API
+- [x] Create routes/orders.js for orders API
+- [x] Install dependencies: npm install
+- [x] Run server: npm start
+- [ ] Test API endpoints
+- [x] Update auth.js to use API calls
+- [x] Update cart.js to use API calls
+- [x] Update checkout.js to use API calls
+- [x] Update menu.js to use API calls
+- [x] Modify data.js to not export data directly (or remove)
 
-# COMPLETED: Make site offline and work on one device
+# Real Payment Processing TODO
 
-- [x] Add Service Worker for caching assets and pages
-- [x] Register Service Worker in index.html
-- [x] Ensure all data is stored in localStorage (cart, auth, orders)
-- [x] Add margin-top to form-section for space between header and forms
-
-# COMPLETED: Add loading effects to all pages
-
-- [x] Add fade-in animation on scroll for sections across all pages
-- [x] Include fade-in CSS classes and keyframes
+- [ ] Add Stripe dependency to backend
+- [ ] Create payment route for payment intents
+- [ ] Update orders to include payment status
+- [ ] Add Stripe.js to frontend
+- [ ] Update checkout.js for Stripe integration
+- [ ] Add payment form UI
+- [ ] Test payment flow
